@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat App</title>
+    <style>
+        body {
+            background-color: #000000;
+            color: #FFFFFF;
+            font-family: Arial, sans-serif;
+        }
+        .chat-content {
+            padding: 20px;
+        }
+        .message {
+            margin: 10px 0;
+            padding: 10px;
+            background-color: #444;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="chat-content" id="chatContent"></div>
+    <input type="text" id="chatInput" placeholder="Type a message...">
+
+    <script>
+        // Load existing messages
+        fetch('/messages')
+            .then(response => response.json())
+            .then(data => {
+                const chatContent = document.getElementById('chatContent');
+                data.forEach(message => {
+                    const messageElement = document.createElement('div');
+                    messageElement.className = 'message';
+                    messageElement.textContent = message;
+                    chatContent.appendChild(messageElement);
+                });
+            });
+
+        // Send a new message
+        const chatInput = document.getElementById('chatInput');
+        chatInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                const message = chatInput.value;
+                fetch('/messages', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message })
+                })
+                .then(response => response.text())
+                .then(data => {
+                    const chatContent = document.getElementById('chatContent');
+                    const messageElement = document.createElement('div');
+                    messageElement.className = 'message';
+                    messageElement.textContent = message;
+                    chatContent.appendChild(messageElement);
+                    chatInput.value = '';
+                });
+            }
+        });
+    </script>
+</body>
+</html>
